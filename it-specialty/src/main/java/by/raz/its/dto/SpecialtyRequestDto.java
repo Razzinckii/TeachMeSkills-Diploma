@@ -1,4 +1,4 @@
-package by.morozov.its.dto;
+package by.raz.its.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

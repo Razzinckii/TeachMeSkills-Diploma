@@ -1,4 +1,4 @@
-package by.morozov.its;
+package by.raz.its;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

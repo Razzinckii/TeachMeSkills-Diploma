@@ -1,7 +1,7 @@
-package by.morozov.its.global;
+package by.raz.its.global;
 
-import by.morozov.its.exception.SpecialtyNotFoundException;
-import by.morozov.its.util.ErrorMessage;
+import by.raz.its.exception.SpecialtyNotFoundException;
+import by.raz.its.util.ErrorMessage;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;

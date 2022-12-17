@@ -41,7 +41,7 @@ resource "aws_autoscaling_group" "ecs_asg" {
   dynamic "tag" {
     for_each = {
       Name  = "App in ASG"
-      Owner = "Maksim Morozov"
+      Owner = "Raz"
     }
     content {
       key                 = tag.key

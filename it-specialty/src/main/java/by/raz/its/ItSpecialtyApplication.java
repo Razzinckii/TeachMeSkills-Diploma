@@ -1,4 +1,4 @@
-package by.morozov.its;
+package by.raz.its;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

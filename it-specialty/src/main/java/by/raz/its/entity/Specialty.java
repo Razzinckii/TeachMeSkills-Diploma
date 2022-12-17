@@ -1,4 +1,4 @@
-package by.morozov.its.entity;
+package by.raz.its.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

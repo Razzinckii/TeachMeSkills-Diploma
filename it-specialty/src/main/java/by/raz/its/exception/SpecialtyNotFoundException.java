@@ -1,4 +1,4 @@
-package by.morozov.its.exception;
+package by.raz.its.exception;
 
 public class SpecialtyNotFoundException extends RuntimeException {
 

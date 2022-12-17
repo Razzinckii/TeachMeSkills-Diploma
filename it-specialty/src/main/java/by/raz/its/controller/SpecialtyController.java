@@ -1,8 +1,8 @@
-package by.morozov.its.controller;
+package by.raz.its.controller;
 
-import by.morozov.its.dto.SpecialtyRequestDto;
-import by.morozov.its.entity.Specialty;
-import by.morozov.its.service.SpecialtyService;
+import by.raz.its.dto.SpecialtyRequestDto;
+import by.raz.its.entity.Specialty;
+import by.raz.its.service.SpecialtyService;
 import lombok.AllArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 

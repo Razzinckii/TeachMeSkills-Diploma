@@ -1,9 +1,9 @@
-package by.morozov.its.service.impl;
+package by.raz.its.service.impl;
 
-import by.morozov.its.entity.Specialty;
-import by.morozov.its.exception.SpecialtyNotFoundException;
-import by.morozov.its.repository.SpecialtyRepository;
-import by.morozov.its.service.SpecialtyService;
+import by.raz.its.entity.Specialty;
+import by.raz.its.exception.SpecialtyNotFoundException;
+import by.raz.its.repository.SpecialtyRepository;
+import by.raz.its.service.SpecialtyService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
