@@ -13,7 +13,7 @@ env:
 on:
   pull_request:
     types: [closed]
-    branches: [ master ]
+    branches: [ main ]
     paths: ['it-specialty/**']
 
 jobs:

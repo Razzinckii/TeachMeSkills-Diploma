@@ -62,4 +62,3 @@ Or if you've already install `jq` you can run the following command and get a so
 >       curl -s -H "Content-Type: application/json" -X POST -d '{"name": "maintenance"}' https://your_domain/api/v1/specialty | jq '.technologies[].name'
 The application also accepts simple GET requests by command:
 >       curl -s https://your_domain/api/v1/specialty
-
