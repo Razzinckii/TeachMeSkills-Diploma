@@ -13,7 +13,7 @@
 #       - ALB with HTTPS redirect
 #       - ALB Hosted Zone attachment
 #
-# Developed by maksmore 2022.04
+# Developed by raz 2022.04
 #--------------------------------------------------------------------------------------|
 
 provider "aws" {}

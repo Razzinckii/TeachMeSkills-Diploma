@@ -14,7 +14,7 @@ The solution works only in the `us-east-1` region because of it's hardcode.
 ### Variables
 
 Export your credentials to environment variables.
-By default, the `username` and `password` values for the database have the values `postgres` and `password`, respectively. You also need to specify the unique name of your AWS RDS database. For your own purposes, this value can be changed in *`it-specialty/src/main/java/by/morozov/its/controller/SpecialtyController.java`*
+By default, the `username` and `password` values for the database have the values `postgres` and `password`, respectively. You also need to specify the unique name of your AWS RDS database. For your own purposes, this value can be changed in *`it-specialty/src/main/java/by/raz/its/controller/SpecialtyController.java`*
 
 **Requirements:**  
 | Environment variables |
@@ -63,11 +63,3 @@ Or if you've already install `jq` you can run the following command and get a so
 The application also accepts simple GET requests by command:
 >       curl -s https://your_domain/api/v1/specialty
 
-***
-
-**Status of Last App Deployment:**
-
-![cd workflow](https://github.com/maksmore/Learning-with-TeachMeSkills/actions/workflows/cd.yml/badge.svg)  
-![ci workflow](https://github.com/maksmore/Learning-with-TeachMeSkills/actions/workflows/ci.yml/badge.svg)  
-
-Developed by *maksmore*

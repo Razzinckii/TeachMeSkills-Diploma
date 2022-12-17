@@ -1,6 +1,6 @@
-package by.morozov.its.service;
+package by.raz.its.service;
 
-import by.morozov.its.entity.Specialty;
+import by.raz.its.entity.Specialty;
 
 public interface SpecialtyService {
 

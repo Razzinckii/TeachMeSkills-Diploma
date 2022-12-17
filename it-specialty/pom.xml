@@ -8,7 +8,7 @@
 		<version>2.6.3</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>by.morozov</groupId>
+	<groupId>by.raz</groupId>
 	<artifactId>it-specialty</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>it-specialty</name>

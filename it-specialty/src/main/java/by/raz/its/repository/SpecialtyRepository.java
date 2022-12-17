@@ -1,6 +1,6 @@
-package by.morozov.its.repository;
+package by.raz.its.repository;
 
-import by.morozov.its.entity.Specialty;
+import by.raz.its.entity.Specialty;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
