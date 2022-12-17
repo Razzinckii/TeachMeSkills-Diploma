@@ -1,0 +1,193 @@
+name: Docker-Image-CI
+
+env:
+  AWS_REGION  :      "us-east-1"
+  IMAGE_NAME  :      "diploma_project"
+  APP_VERSION :      "v0.0.1"
+  ECR_REPOSITORY:    "diploma_project"
+  WORKING_DIRECTORY: ./it-specialty
+
+on:
+  pull_request:
+    branches: [ master ]
+    paths:    [ 'it-specialty/**' ]
+
+jobs:
+  
+  linter:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+    
+    - name: Super Linter
+      uses: github/super-linter/slim@v4.8.7
+      env:
+        # Main settings
+        # image: docker://ghcr.io/github/super-linter:v4.9.0
+        DEFAULT_BRANCH: master
+        VALIDATE_ALL_CODEBASE: false
+        FILTER_REGEX_EXCLUDE: (\.github.*|.*inventory.ya?ml|.*docker-compose.ya?ml)
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        # Tools
+        ANSIBLE_DIRECTORY: .
+        VALIDATE_ANSIBLE: true
+        VALIDATE_BASH: true
+        VALIDATE_BASH_EXEC: true
+        VALIDATE_DOCKERFILE: true
+        VALIDATE_DOCKERFILE_HADOLINT: true
+        VALIDATE_ENV: true
+        VALIDATE_GITHUB_ACTIONS: true
+        VALIDATE_MARKDOWN: true
+        VALIDATE_PYTHON: true
+        VALIDATE_PYTHON_FLAKE8: true
+        VALIDATE_PYTHON_ISORT: true
+        VALIDATE_SHELL_SHFMT: true
+        VALIDATE_TERRAFORM_TFLINT: true
+        VALIDATE_TERRAFORM_TERRASCAN: true
+        VALIDATE_TERRAGRUNT: true
+        VALIDATE_YAML: true
+
+  build:
+    runs-on: ubuntu-latest
+    needs: linter
+    defaults:
+      run:
+        working-directory: ${{ env.WORKING_DIRECTORY }}
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+    
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v1
+
+    - name: Build and export
+      uses: docker/build-push-action@v2
+      id:   build-image
+      with:
+        context: ./it-specialty
+        tags: ${{ env.IMAGE_NAME }}:${{ env.APP_VERSION }}
+        outputs: type=docker,dest=/tmp/${{ env.IMAGE_NAME }}.tar
+    
+    - name: Upload artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: ${{ env.IMAGE_NAME }}
+        path: /tmp/${{ env.IMAGE_NAME }}.tar
+
+  test:
+    runs-on: ubuntu-latest
+    env:
+        POSTGRES_USER:     ${{ secrets.POSTGRES_USER }}
+        POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+        POSTGRES_DATABASE: ${{ secrets.POSTGRES_DATABASE }}
+        SPRING_DATASOURCE_USERNAME: ${{ secrets.POSTGRES_USER }}
+        SPRING_DATASOURCE_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+    defaults:
+      run:
+        working-directory: ${{ env.WORKING_DIRECTORY }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Build Testing
+        run: docker compose up -d
+
+      - name: Port testing
+        run: |
+          sleep 15
+          telnet localhost 8080 &
+          echo "The connection is established!"
+      
+      - name: Call API
+        uses: indiesdev/curl@v1.1
+        with:
+          url: http://localhost:8080/api/v1/specialty
+          method: "GET"
+          accept: 200,201,204
+          timeout: 60000
+          log-response: true
+      
+      - name: First REST API with cURL Testing
+        uses: indiesdev/curl@v1.1
+        id: api
+        with:
+          url: http://localhost:8080/api/v1/specialty
+          method: "POST"
+          accept: 200,201,204
+          headers: '{ "Content-Type": "application/json" }'
+          body: '{ "name": "maintenance" }'
+          timeout: 60000
+          log-response: true
+      
+      - name: Second REST API with cURL Testing
+        uses: indiesdev/curl@v1.1
+        id: api2
+        with:
+          url: http://localhost:8080/api/v1/specialty
+          method: "POST"
+          accept: 200,201,204
+          headers: '{ "Content-Type": "application/json" }'
+          body: '{ "name": "developer" }'
+          timeout: 60000
+          log-response: true
+      
+      - name: "Use response"
+        run: echo ${{ steps.api.outputs.response }}
+
+      - name: Serviceability Testing With Code Response
+        run: ./serviceability_script.sh
+
+  publish:
+    runs-on: ubuntu-latest
+    needs: [ linter, build, test ]
+
+    steps:
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+      
+      - name: Download artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: ${{ env.IMAGE_NAME }}
+          path: /tmp
+      
+      - name: Load image
+        run: |
+          docker load --input /tmp/${{ env.IMAGE_NAME }}.tar
+          docker image ls -a
+
+      - name: Configure my AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id     : ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key : ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region            : ${{ env.AWS_REGION }}
+      
+      - name: Authentication Docker Client to AWS ECR
+        run: |
+          aws ecr-public get-login-password --region us-east-1 | \
+          docker login --username AWS \
+          --password-stdin public.ecr.aws/j1n7b9p6
+        
+      - name: Push to AWS ECR
+        run: |
+          docker tag ${{ env.IMAGE_NAME }}:${{ env.APP_VERSION }} \
+          public.ecr.aws/j1n7b9p6/${{ env.IMAGE_NAME }}:${{ env.APP_VERSION }}
+          docker push public.ecr.aws/j1n7b9p6/${{ env.IMAGE_NAME }}:${{ env.APP_VERSION }}
+
+      - name: Send Telegram Message on Push
+        uses: appleboy/telegram-action@master
+        with:
+          to: ${{ secrets.TELEGRAM_TO }}
+          token: ${{ secrets.TELEGRAM_TOKEN }}
+          message: |
+            The artifact was successfully sent to the ${{ env.ECR_REPOSITORY }} ECR repository by ${{ github.actor }}!
+            
+            Repository: ${{ github.repository }}
+            
+            Commit: {{ commit.sha }}

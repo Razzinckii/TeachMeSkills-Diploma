@@ -1,0 +1,9 @@
+server:
+  port: 8083
+
+spring:
+  datasource:
+    url: jdbc:postgresql://prod-rds.cs7exdr8bvhm.us-east-1.rds.amazonaws.com:5432/postgres
+    driver-class-name: org.postgresql.Driver
+    username: postgres
+    password: password

@@ -1,0 +1,74 @@
+{
+    "ipcMode": null,
+    "executionRoleArn": "arn:aws:iam::233817511251:role/ecsTaskExecutionRole",
+    "containerDefinitions": [
+        {
+            "dnsSearchDomains": null,
+            "environmentFiles": [],
+            "logConfiguration": null,
+            "entryPoint": [],
+            "portMappings": [
+                {
+                    "hostPort": 0,
+                    "protocol": "tcp",
+                    "containerPort": 8083
+                }
+            ],
+            "command": null,
+            "linuxParameters": null,
+            "cpu": 256,
+            "environment": null,
+            "resourceRequirements": null,
+            "ulimits": null,
+            "dnsServers": null,
+            "mountPoints": null,
+            "workingDirectory": null,
+            "secrets": null,
+            "dockerSecurityOptions": null,
+            "memory": 256,
+            "volumesFrom": null,
+            "stopTimeout": null,
+            "image": "public.ecr.aws/j1n7b9p6/diploma_project:v0.0.1",
+            "startTimeout": null,
+            "firelensConfiguration": null,
+            "dependsOn": null,
+            "disableNetworking": null,
+            "interactive": null,
+            "healthCheck": null,
+            "essential": true,
+            "links": null,
+            "hostname": null,
+            "extraHosts": null,
+            "pseudoTerminal": null,
+            "user": null,
+            "readonlyRootFilesystem": null,
+            "dockerLabels": null,
+            "systemControls": null,
+            "privileged": null,
+            "name": "app-container",
+            "repositoryCredentials": {
+                "credentialsParameter": ""
+            }
+        }
+    ],
+    "placementConstraints": [
+        {
+            "type": "memberOf",
+            "expression": "attribute:ecs.availability-zone in [us-east-1a, us-east-1b]"
+        }
+    ],
+    "memory": null,
+    "taskRoleArn": "arn:aws:iam::233817511251:role/Diploma-execution-task-role",
+    "family": "application",
+    "pidMode": null,
+    "requiresCompatibilities": [
+        "EC2"
+    ],
+    "networkMode": null,
+    "runtimePlatform": null,
+    "cpu": null,
+    "inferenceAccelerators": [],
+    "proxyConfiguration": null,
+    "volumes": [],
+    "tags": []
+}

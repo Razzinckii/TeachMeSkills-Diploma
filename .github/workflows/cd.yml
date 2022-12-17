@@ -1,0 +1,70 @@
+name: Docker-Image-CD
+
+env:
+  AWS_REGION:          "us-east-1"
+  APP_VERSION:         "v0.0.1"
+  IMAGE_NAME:          "diploma_project"
+  ECR_REPOSITORY:      "diploma_project"
+  ECS_SERVICE:         "tms_project"
+  ECS_CLUSTER:         "ECS-Regular-Cluster"
+  ECS_TASK_DEFINITION: "./it-specialty/task_definition.json"
+  CONTAINER_NAME:      "app-container"
+
+on:
+  pull_request:
+    types: [closed]
+    branches: [ master ]
+    paths: ['it-specialty/**']
+
+jobs:
+  deploy:
+    name: Deploy to AWS ECS
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.merged == true
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Configure my AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id     : ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key : ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region            : ${{ env.AWS_REGION }}
+
+      - name: Authentication Docker Client to AWS ECR
+        run: |
+          aws ecr-public get-login-password --region us-east-1 | \
+          docker login --username AWS \
+          --password-stdin public.ecr.aws/j1n7b9p6
+
+      - name: Fill in the new image ID in the Amazon ECS task definition
+        id: task-def
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: ${{ env.ECS_TASK_DEFINITION }}
+          container-name: ${{ env.CONTAINER_NAME }}
+          image: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.IMAGE_NAME }}:${{ env.APP_VERSION }}
+
+      - name: Deploy Amazon ECS task definition
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+        with:
+          task-definition: ${{ env.ECS_TASK_DEFINITION }}
+          service: ${{ env.ECS_SERVICE }}
+          cluster: ${{ env.ECS_CLUSTER }}
+          wait-for-service-stability: true
+      
+      - name: Success Deployment Notification
+        uses: ./
+        with:
+          to: ${{ secrets.TELEGRAM_TO }}
+          token: ${{ secrets.TELEGRAM_TOKEN }}
+          message: |
+            The new version of application was successfully deployed to the ${{ env.ECS_SERVICE }} ECS service by ${{ github.actor }}!
+            
+            Repository: ${{ github.repository }}
+            
+            Commit: {{ commit.sha }}
+
+            App version: ${{ env.APP_VERSION }}
